@@ -3,10 +3,9 @@
 <img src="https://github.com/hatrang12/8weeksqlchallenge.com/blob/main/2.png" align="center" width="400" height="400" >
   
 ## 📕 Table of Contents
-* [Business Task]
-* [Entity Relationship Diagram]
-* [Case Study Questions]
-* [My Solution]
+* [Business Task](#Business-Task)
+* [Entity Relationship Diagram](#entity-relationship-diagram)
+* [Case Study Questions](Case-Study-Questions)
 
 If you are interest in this case study you can find it in this [link](https://8weeksqlchallenge.com/case-study-2/)
 
