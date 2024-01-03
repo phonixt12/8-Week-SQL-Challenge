@@ -226,19 +226,24 @@ ORDER BY  customer_id
 ---
 ### Q6. What was the maximum number of pizzas delivered in a single order?
 ```TSQL
-SELECT MAX(pizza_count) AS max_count
-FROM (
-  SELECT 
-    c.order_id,
-    COUNT(c.pizza_id) AS pizza_count
-  FROM #customer_orders_temp c
-  JOIN #runner_orders_temp r 
-    ON c.order_id = r.order_id
-  WHERE r.cancellation IS NULL
-  GROUP BY c.order_id
-) tmp;
+
+SELECT max(pizza_ordered) max_order
+FROM(
+SELECT 
+ 		cu.order_id,
+        count( cu.pizza_id) pizza_ordered
+        
+FROM
+	customer_orders cu 
+    LEFT JOIN pizza_runner.pizza_names pi 
+   	ON cu.pizza_id = pi.pizza_id
+    LEFT JOIN runner_orders ru
+    ON cu.order_id=ru.order_id
+GROUP BY  cu.order_id
+ORDER BY  cu.order_id ) pizza;
 ```
-| max_count  |
+
+|max_order |
 |------------|
 | 3          |
 
@@ -246,16 +251,20 @@ FROM (
 ### Q7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 ```TSQL
 SELECT 
-  c.customer_id,
-  SUM(CASE WHEN exclusions != '' OR extras != '' THEN 1 ELSE 0 END) AS has_change,
-  SUM(CASE WHEN exclusions = '' AND extras = '' THEN 1 ELSE 0 END) AS no_change
-FROM #customer_orders_temp c
-JOIN #runner_orders_temp r 
-  ON c.order_id = r.order_id
-WHERE r.cancellation IS NULL
-GROUP BY c.customer_id;
+ 		cu.customer_id,
+       sum( CASE WHEN (exclusions is null and extras is not null) or (exclusions is not null and extras is null) then 1 else 0 end  ) has_changes,
+       sum( CASE WHEN exclusions is null and extras is null then 1 else 0 end  ) no_changes
+FROM
+	customer_orders cu 
+    LEFT JOIN pizza_runner.pizza_names pi 
+   	ON cu.pizza_id = pi.pizza_id
+    LEFT JOIN runner_orders ru
+    ON cu.order_id=ru.order_id
+GROUP BY  cu.customer_id
+ORDER BY  cu.customer_id
+;
 ```
-| customer_id | has_change | no_change  |
+| customer_id | has_changes | no_changes  |
 |-------------|------------|------------|
 | 101         | 0          | 2          |
 | 102         | 0          | 3          |
@@ -266,12 +275,15 @@ GROUP BY c.customer_id;
 ---
 ### Q8. How many pizzas were delivered that had both exclusions and extras?
 ```TSQL
-SELECT 
-  SUM(CASE WHEN exclusions != '' AND extras != '' THEN 1 ELSE 0 END) AS change_both
-FROM #customer_orders_temp c
-JOIN #runner_orders_temp r 
-  ON c.order_id = r.order_id
-WHERE r.cancellation IS NULL;
+SELECT
+       sum( CASE WHEN exclusions is not null and extras is not null then 1 else 0 end  )  change_both
+FROM
+	customer_orders cu 
+    LEFT JOIN pizza_runner.pizza_names pi 
+   	ON cu.pizza_id = pi.pizza_id
+    LEFT JOIN runner_orders ru
+    ON cu.order_id=ru.order_id
+    WHERE cancellation is null;
 ```
 | change_both  |
 |--------------|
@@ -281,13 +293,13 @@ WHERE r.cancellation IS NULL;
 ### Q9. What was the total volume of pizzas ordered for each hour of the day?
 ```TSQL
 SELECT 
-  DATEPART(HOUR, order_time) AS hour_of_day,
-  COUNT(order_id) AS pizza_volume
-FROM #customer_orders_temp
-GROUP BY DATEPART(HOUR, order_time)
-ORDER BY hour_of_day;
+        hours ,
+        count(pizza_id) pizza
+from customer_orders
+group by  hours
+order by  hours;
 ```
-| hour_of_day | pizza_volume  |
+| hour | pizza  |
 |-------------|---------------|
 | 11          | 1             |
 | 13          | 3             |
@@ -300,12 +312,13 @@ ORDER BY hour_of_day;
 ### Q10. What was the volume of orders for each day of the week?
 ```TSQL
 SELECT 
-  DATENAME(weekday, order_time) AS week_day,
-  COUNT(order_id) AS order_volume
-FROM #customer_orders_temp
-GROUP BY DATENAME(weekday, order_time);
+        DATENAME(weekday, order_time) day_name ,
+        count(pizza_id) pizza
+from customer_orders
+group by  day_name
+order by  day_name;
 ```
-| week_day  | order_volume  |
+| day_name  | pizza |
 |-----------|---------------|
 | Friday    | 1             |
 | Saturday  | 5             |
