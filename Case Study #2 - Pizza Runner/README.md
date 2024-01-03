@@ -3,10 +3,9 @@
 <img src="https://github.com/hatrang12/8weeksqlchallenge.com/blob/main/2.png" align="center" width="400" height="400" >
   
 ## 📕 Table of Contents
-* [Business Task]
-* [Entity Relationship Diagram]
-* [Case Study Questions]
-* [My Solution]
+* [Business Task](#Business-Task)
+* [Entity Relationship Diagram](#entity-relationship-diagram)
+* [Case Study Questions](#Case-Study-Questions)
 
 If you are interest in this case study you can find it in this [link](https://8weeksqlchallenge.com/case-study-2/)
 
@@ -16,7 +15,7 @@ Danny, inspired by the massive global pizza consumption, hatched a plan to creat
 ## Entity Relationship Diagram
 ![Capture](https://github.com/hatrang12/8weeksqlchallenge.com/assets/107136018/125a8459-cef9-4912-993b-cbb22a775fe1)
 
-## ❓ Case Study Questions
+## Case Study Questions
 
 ### A. Pizza Metrics
 View my solution [HERE]
