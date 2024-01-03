@@ -149,38 +149,46 @@ ORDER BY  runner_id
 | 1         | 4                  |
 | 2         | 3                  |
 | 3         | 1                  |
+
 ---
 ### Q4. How many successful orders were delivered by each runner?
 Approach 1: Use subquery.
 ```TSQL
+WITH customer_orders as (
 SELECT 
-  p.pizza_name,
-  COUNT(*) AS deliver_count
-FROM #customer_orders_temp c
-JOIN pizza_names p 
-  ON c.pizza_id = p.pizza_id
-WHERE c.order_id IN (
-    SELECT order_id 
-    FROM #runner_orders_temp
-    WHERE cancellation IS NULL)
-GROUP BY p.pizza_name;
+	 order_id, customer_id, pizza_id,
+     CASE WHEN exclusions ='null' or exclusions =''  then  null else exclusions end exclusions ,
+     CASE WHEN extras='null' or extras =''  then  null else extras end extras ,
+     order_time
+FROM pizza_runner.customer_orders
+  ),
+  
+  runner_orders as (
+  SELECT 
+	 order_id, runner_id, 
+     CASE WHEN pickup_time ='null'  then  null else pickup_time end pickup_time,
+     CASE WHEN distance ='null'   then  null else distance end distance ,
+     CASE WHEN duration='null'   then  null else duration end duration ,
+     CASE WHEN cancellation ='null' or cancellation =''  then  null else cancellation end cancellation
+FROM pizza_runner.runner_orders )
+SELECT 
+ 		pizza_name,
+        count( cu.pizza_id) total_pizza
+FROM
+	customer_orders cu 
+    JOIN pizza_runner.pizza_names pi 
+   	ON cu.pizza_id = pi.pizza_id
+    JOIN runner_orders ru
+    ON cu.order_id=ru.order_id
+WHERE
+	cancellation is null
+GROUP BY  pizza_name
+ORDER BY  pizza_name
+
 ```
 
-Approach 2: Use JOIN.
-```TSQL
-SELECT 
-  p.pizza_name,
-  COUNT(*) AS deliver_count
-FROM #customer_orders_temp c
-JOIN pizza_names p 
-  ON c.pizza_id = p.pizza_id
-JOIN #runner_orders_temp r 
-  ON c.order_id = r.order_id
-WHERE r.cancellation IS NULL
-GROUP BY p.pizza_name;
-```
 
-| pizza_name | deliver_count  |
+| pizza_name | total_pizza  |
 |------------|----------------|
 | Meatlovers | 9              |
 | Vegetarian | 3              |
@@ -203,7 +211,7 @@ ORDER BY  customer_id
 ;
 ```
 
-| customer_id | Meatlovers |
+| customer_id | pizza_name |
 |-------------|------------|
 | 101         | Meatlovers |
 | 101         | Vegetarian | 
