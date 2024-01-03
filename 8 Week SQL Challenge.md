@@ -1,7 +1,7 @@
 # 8 Week SQL Challenge
 This resporitory is use showcase my SQL skill and my knowledge about SQL query , cleaning and understand business inisght
 
-This dataset is from 8 Week SQL Challenge : **link(https://8weeksqlchallenge.com)**
+This dataset is from 8 Week SQL Challenge : **(https://8weeksqlchallenge.com)**
 
 ## Table of Content
 
