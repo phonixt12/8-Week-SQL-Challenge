@@ -1,5 +1,5 @@
 # 🍕 Case Study #2 - Pizza Runner
-## B. Runner and Customer Experience
+## C. Ingredient Optimisation
 ### Q1. What are the standard ingredients for each pizza?
 ```TSQL
 SELECT 
