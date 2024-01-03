@@ -6,7 +6,8 @@
   	* Convert ```null``` values and ```'null'``` text values in ```exclusions``` and ```extras``` into blank ```''```.
   
   ```TSQL
-  SELECT 
+  with customer_orders as (
+ SELECT 
     order_id,
     customer_id,
     pizza_id,
@@ -19,11 +20,11 @@
       	ELSE extras 
       	END AS extras,
     order_time
-  INTO #customer_orders_temp
-  FROM customer_orders;
+ 
+  FROM pizza_runner.customer_orders )
   
   SELECT *
-  FROM #customer_orders_temp;
+  FROM customer_orders
   ```
 | order_id | customer_id | pizza_id | exclusions | extras | order_time               |
 |----------|-------------|----------|------------|--------|--------------------------|
@@ -44,17 +45,18 @@
   
   * Create a temporary table ```#runner_orders_temp``` from ```runner_orders``` table:
   	* Convert ```'null'``` text values in ```pickup_time```, ```duration``` and ```cancellation``` into ```null``` values. 
-	* Cast ```pickup_time``` to DATETIME.
+	* Cast ```pickup_time``` to DATE.
 	* Cast ```distance``` to FLOAT.
 	* Cast ```duration``` to INT.
   
   ```TSQL
-  SELECT 
+  with runner_orders as (
+SELECT 
     order_id,
     runner_id,
     CAST(
     	CASE WHEN pickup_time LIKE 'null' THEN NULL ELSE pickup_time END 
-	    AS DATETIME) AS pickup_time,
+	    AS DATE) AS pickup_time,
     CAST(
     	CASE WHEN distance LIKE 'null' THEN NULL
 	      WHEN distance LIKE '%km' THEN TRIM('km' FROM distance)
@@ -69,12 +71,12 @@
       AS INT) AS duration,
     CASE WHEN cancellation IN ('null', 'NaN', '') THEN NULL 
         ELSE cancellation
-        END AS cancellation
-INTO #runner_orders_temp
-FROM runner_orders;
+        END AS cancellation 
+
+FROM pizza_runner.runner_orders )
   
 SELECT *
-FROM #runner_orders_temp;
+FROM runner_orders;
 
 ```
 | order_id | runner_id | pickup_time             | distance | duration | cancellation             |
