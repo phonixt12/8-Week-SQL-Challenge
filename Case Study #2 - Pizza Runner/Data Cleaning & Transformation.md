@@ -3,7 +3,7 @@
   
   * Create a temporary table ```#customer_orders_temp``` from ```customer_orders``` table:
   	* Convert ```null``` values and ```'null'``` text values in ```exclusions``` and ```extras``` into blank ```''```.
-  
+        * Add a ```record_id``` to ```customer_order``` to select each ordered pizza more easily**
   ```TSQL
   with customer_orders as (
  SELECT 
@@ -19,27 +19,28 @@
       	ELSE extras 
       	END AS extras,
     order_time
- 
+ ,row_number () over() record_id
   FROM pizza_runner.customer_orders )
   
   SELECT *
   FROM customer_orders
   ```
-| order_id | customer_id | pizza_id | exclusions | extras | order_time               |
-|----------|-------------|----------|------------|--------|--------------------------|
-| 1        | 101         | 1        |            |        | 2020-01-01 18:05:02.000  |
-| 2        | 101         | 1        |            |        | 2020-01-01 19:00:52.000  |
-| 3        | 102         | 1        |            |        | 2020-01-02 23:51:23.000  |
-| 3        | 102         | 2        |            |        | 2020-01-02 23:51:23.000  |
-| 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46.000  |
-| 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46.000  |
-| 4        | 103         | 2        | 4          |        | 2020-01-04 13:23:46.000  |
-| 5        | 104         | 1        |            | 1      | 2020-01-08 21:00:29.000  |
-| 6        | 101         | 2        |            |        | 2020-01-08 21:03:13.000  |
-| 7        | 105         | 2        |            | 1      | 2020-01-08 21:20:29.000  |
-| 8        | 102         | 1        |            |        | 2020-01-09 23:54:33.000  |
-| 9        | 103         | 1        | 4          | 1, 5   | 2020-01-10 11:22:59.000  |
-| 10       | 104         | 1        |            |        | 2020-01-11 18:34:49.000  |
+| order_id | customer_id | pizza_id | exclusions | extras | order_time              | record_id  |
+|----------|-------------|----------|------------|--------|-------------------------|------------|
+| 1        | 101         | 1        |            |        | 2020-01-01 18:05:02.000 | 1          |
+| 2        | 101         | 1        |            |        | 2020-01-01 19:00:52.000 | 2          |
+| 3        | 102         | 1        |            |        | 2020-01-02 23:51:23.000 | 3          |
+| 3        | 102         | 2        |            |        | 2020-01-02 23:51:23.000 | 4          |
+| 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46.000 | 5          |
+| 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46.000 | 6          |
+| 4        | 103         | 2        | 4          |        | 2020-01-04 13:23:46.000 | 7          |
+| 5        | 104         | 1        |            | 1      | 2020-01-08 21:00:29.000 | 8          |
+| 6        | 101         | 2        |            |        | 2020-01-08 21:03:13.000 | 9          |
+| 7        | 105         | 2        |            | 1      | 2020-01-08 21:20:29.000 | 10         |
+| 8        | 102         | 1        |            |        | 2020-01-09 23:54:33.000 | 11         |
+| 9        | 103         | 1        | 4          | 1, 5   | 2020-01-10 11:22:59.000 | 12         |
+| 10       | 104         | 1        |            |        | 2020-01-11 18:34:49.000 | 13         |
+| 10       | 104         | 1        | 2, 6       | 1, 4   | 2020-01-11 18:34:49.000 | 14         |
   
   
   * Create a temporary table ```#runner_orders_temp``` from ```runner_orders``` table:
@@ -91,21 +92,18 @@ FROM runner_orders;
 | 9        | 2         | NULL                    | NULL     | NULL     | Customer Cancellation    |
   
 --- 
-### Create a new temporary table ```#toppingsBreak``` to separate ```toppings``` into multiple rows**
+### Create a new temporary table ``toppingsBreak``` to separate ```toppings``` into multiple rows**
 ```TSQL
-with toppingsBreak as (
-SELECT 
-  pr.pizza_id,
-  TRIM(value) AS topping_id,
-  pt.topping_name
-INTO #toppingsBreak
-FROM pizza_recipes pr
-  CROSS APPLY STRING_SPLIT(toppings, ',') AS t
-JOIN pizza_toppings pt
-  ON TRIM(t.value) = pt.topping_id )
-  
-SELECT *
-FROM toppingsBreak;
+SELECT pizza_id,
+       pt.topping_id,
+       topping_name
+FROM pizza_runner.pizza_toppings pt 
+JOIN (
+SELECT pizza_id,
+       CAST(unnest(string_to_array(toppings, ','))as int) as topping_id
+FROM pizza_runner.pizza_recipes) pr
+ON pt.topping_id=pr.topping_id;
+
 ```
   
 | pizza_id | topping_id | topping_name  |
@@ -137,44 +135,15 @@ FROM toppingsBreak;
 | 3        | 11         | Tomatoes      |
 | 3        | 12         | Tomato Sauce  |
 
-
-### Add an identity column ```record_id``` to ```#customer_orders_temp``` to select each ordered pizza more easily**
-```TSQL
-ALTER TABLE #customer_orders_temp
-ADD record_id INT IDENTITY(1,1);
-
-SELECT *
-FROM customer_orders_temp;
-```
-  
-| order_id | customer_id | pizza_id | exclusions | extras | order_time              | record_id  |
-|----------|-------------|----------|------------|--------|-------------------------|------------|
-| 1        | 101         | 1        |            |        | 2020-01-01 18:05:02.000 | 1          |
-| 2        | 101         | 1        |            |        | 2020-01-01 19:00:52.000 | 2          |
-| 3        | 102         | 1        |            |        | 2020-01-02 23:51:23.000 | 3          |
-| 3        | 102         | 2        |            |        | 2020-01-02 23:51:23.000 | 4          |
-| 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46.000 | 5          |
-| 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46.000 | 6          |
-| 4        | 103         | 2        | 4          |        | 2020-01-04 13:23:46.000 | 7          |
-| 5        | 104         | 1        |            | 1      | 2020-01-08 21:00:29.000 | 8          |
-| 6        | 101         | 2        |            |        | 2020-01-08 21:03:13.000 | 9          |
-| 7        | 105         | 2        |            | 1      | 2020-01-08 21:20:29.000 | 10         |
-| 8        | 102         | 1        |            |        | 2020-01-09 23:54:33.000 | 11         |
-| 9        | 103         | 1        | 4          | 1, 5   | 2020-01-10 11:22:59.000 | 12         |
-| 10       | 104         | 1        |            |        | 2020-01-11 18:34:49.000 | 13         |
-| 10       | 104         | 1        | 2, 6       | 1, 4   | 2020-01-11 18:34:49.000 | 14         |
-  
-
 ### Create a new temporary table ```extrasBreak``` to separate ```extras``` into multiple rows**
 ```TSQL
-
-with extrasBreak as (
+with extrasBreak as 
+(
 SELECT 
-  c.record_id,
-  TRIM(e.value) AS extra_id
-INTO #extrasBreak 
-FROM #customer_orders_temp c
-  CROSS APPLY STRING_SPLIT(extras, ',') AS e )
+  record_id,
+  CAST(unnest(string_to_array(extras, ','))as int) as extras
+FROM customer_orders
+ )
 
 SELECT *
 FROM extrasBreak;
@@ -205,11 +174,9 @@ FROM extrasBreak;
 
 with exclusionsBreak as(
 SELECT 
-  c.record_id,
-  TRIM(e.value) AS exclusion_id
-INTO #exclusionsBreak 
-FROM #customer_orders_temp c
-  CROSS APPLY STRING_SPLIT(exclusions, ',') AS e )
+  record_id,
+  CAST(unnest(string_to_array(exclusions, ','))as int) as exclusions
+FROM customer_orders )
 
 SELECT *
 FROM exclusionsBreak;
