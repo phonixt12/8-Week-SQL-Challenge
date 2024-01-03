@@ -50,7 +50,7 @@
 	* Cast ```duration``` to INT.
   
   ```TSQL
-  with runner_orders as (
+ with runner_orders as (
 SELECT 
     order_id,
     runner_id,
