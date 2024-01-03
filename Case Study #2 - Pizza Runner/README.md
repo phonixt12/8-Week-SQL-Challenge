@@ -15,7 +15,7 @@ Danny, inspired by the massive global pizza consumption, hatched a plan to creat
 ## Entity Relationship Diagram
 ![Capture](https://github.com/hatrang12/8weeksqlchallenge.com/assets/107136018/125a8459-cef9-4912-993b-cbb22a775fe1)
 
-## ❓ Case Study Questions
+## Case Study Questions
 
 ### A. Pizza Metrics
 View my solution [HERE]
