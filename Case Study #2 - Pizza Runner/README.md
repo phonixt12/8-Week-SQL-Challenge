@@ -5,7 +5,7 @@
 ## 📕 Table of Contents
 * [Business Task](#Business-Task)
 * [Entity Relationship Diagram](#entity-relationship-diagram)
-* [Case Study Questions](Case-Study-Questions)
+* [Case Study Questions](#Case-Study-Questions)
 
 If you are interest in this case study you can find it in this [link](https://8weeksqlchallenge.com/case-study-2/)
 
