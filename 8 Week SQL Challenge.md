@@ -7,4 +7,4 @@ This dataset is from 8 Week SQL Challenge : **(https://8weeksqlchallenge.com)**
 
 This is the list of my case studies. You can choose a case study by click on it :
 
-1.[Case Study #1: Danny's Diner](https://github.com/phonixt12/8-Week-SQL-Challenge/tree/main/Case%20Study%20%231%20-%20Danny's%20Diner)
+1.Case Study #1: Danny's Diner(https://github.com/phonixt12/8-Week-SQL-Challenge/tree/main/Case%20Study%20%231%20-%20Danny's%20Diner)
