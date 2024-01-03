@@ -18,7 +18,7 @@ Danny, inspired by the massive global pizza consumption, hatched a plan to creat
 ## Case Study Questions
 
 ### A. Pizza Metrics
-View my solution [HERE]
+View my solution [HERE(]https://github.com/phonixt12/8-Week-SQL-Challenge/blob/main/Case%20Study%20%232%20-%20Pizza%20Runner/A.%20Pizza%20Metrics.md)
 
 1. How many pizzas were ordered?
 2. How many unique customer orders were made?
