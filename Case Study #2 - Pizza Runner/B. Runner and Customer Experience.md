@@ -132,8 +132,9 @@ SELECT
   COUNT(distance) AS delivered,
   COUNT(order_id) AS total,
   100 * COUNT(distance) / COUNT(order_id) AS successful
-FROM #runner_orders_temp
-GROUP BY runner_id;
+FROM runner_orders
+GROUP BY runner_id
+ORDER BY runner_id;
 ```
 | runner_id | delivered | total | successful  |
 |-----------|-----------|-------|-----------------|
