@@ -189,8 +189,11 @@ FROM
 ````
 #### Steps:
 - Create a CTE named `pre_data` and within the CTE, join the `menu` table and `sales` table by using the `product_id` .
-- Group results by `customer_id` and `product_name` and calculate the count of `product_id` . 
+  
+- Group results by `customer_id` and `product_name` and calculate the count of `product_id` .
+  
 - Use the **dense_rank()** window function to calculate the ranking of each `sales.customer_id` partition based on the  **count(`sales.customer_id`)** in descending order.
+  
 - In the outer query, select the columns by filltering with in the **where** clause to retrieve only the rows where the rank column equals 1, representing the rows with the highest order count for each customer
 
 | customer_id  |product_name|
@@ -237,8 +240,12 @@ WHERE
 
 #### Steps:
 - Create a Common Table Expression (CTE) named joined_as_member. In this CTE, select the necessary columns and employ the row_number() window function. Partition the data by members.customer_id, and order the rows within each members.customer_id partition by sales.order_date.
+  
 -Join the tables dannys_diner.members and dannys_diner.sales on the customer_id column. Include a condition to only include sales that occurred after the member's join_date (sales.order_date > members.join_date).
+
 -In the outer query, join the joined_as_member CTE with the dannys_diner.menu on the product_id column.
+
+
 -In the WHERE clause, filter the results to include only rows where the row_num column equals 1, indicating the first row within each customer_id partition.
 - Order the result set by customer_id in ascending order
   
@@ -284,10 +291,15 @@ WHERE
 
 #### Steps:
 -Establish a Common Table Expression (CTE) named purchased_prior_member.
+
 -Within the CTE, carefully select the pertinent columns and employ the ROW_NUMBER() window function to determine the ranking. This ranking is computed based on the order dates of sales, arranged in descending order within each customer's group.
+
 -Perform a join between the dannys_diner.members table and the dannys_diner.sales table, utilizing the customer_id column. Ensure inclusion of only those sales that transpired prior to the customer's membership initiation (sales.order_date < members.join_date).
+
 -Employ the purchased_prior_member CTE in conjunction with the dannys_diner.menu table, using the product_id column for the join operation.
+
 -Apply a filtering condition to the result set, retaining only the rows where the rank is 1. This signifies the earliest purchase made by each customer before their enrollment as a member.
+
 -Arrange the final result in ascending order based on the customer_id
 
 | customer_id | product_name |
